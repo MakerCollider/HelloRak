@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QVariant>
 
 #include "image_signal.h"
 #include "draw_image_item.h"
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QImage>("QImage&");
     qmlRegisterType<QDrawImageItem>("DrawItems", 1, 0, "QDrawImageItem");
+
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

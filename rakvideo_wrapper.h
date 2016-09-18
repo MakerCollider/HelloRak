@@ -22,9 +22,6 @@ public:
     static ImageSignal *signal_class;
 
     static QImage image_;
-
-signals:
-    void getImage();
 };
 
 #endif // RAKVIDEO_WRAPPER_H_

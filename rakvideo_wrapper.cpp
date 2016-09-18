@@ -5,7 +5,7 @@
 
 #include "rakvideo_wrapper.h"
 
-QImage RakVideoWrapper::image_;
+QImage RakVideoWrapper::image_ = QImage(640, 480, QImage::Format_ARGB32);
 ImageSignal* RakVideoWrapper::signal_class;
 
 RakVideoWrapper::RakVideoWrapper(QObject *parent) : QObject(parent) {
@@ -17,6 +17,7 @@ void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint he
 
     Q_UNUSED(thiz)
 
+    int r,g,b;
     float yvalue, uvalue, vvalue;
 
     jbyte* yRawData = env->GetByteArrayElements(yData, 0);
@@ -27,8 +28,7 @@ void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint he
     uchar* cuData = (uchar*)(uRawData);
     uchar* cvData = (uchar*)(vRawData);
 
-    int r,g,b;
-    QImage image = QImage((int)(width), (int)(height), QImage::Format_ARGB32);
+    //image = QImage((int)(width), (int)(height), QImage::Format_ARGB32);
 
     for(int i=0; i<height; i++) {
       for(int j=0; j<width; j++) {
@@ -48,11 +48,11 @@ void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint he
         if(g > 254) { g = 254; }
         if(b > 254) { b = 254; }
 
-        image.setPixel(j,i,qRgb(r,g,b));
+        image_.setPixel(j,i,qRgb(r,g,b));
       }
     }
 
-    emit signal_class->SignalImage(image);
+    emit signal_class->SignalImage(image_);
 }
 
 void RakVideoWrapper::registerNativeMethods() {
