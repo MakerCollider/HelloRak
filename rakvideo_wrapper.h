@@ -22,6 +22,8 @@ public:
     Q_INVOKABLE void callRakJava(QString message);
 
     static ImageSignal *signal_class;
+
+    static QImage image11;
 };
 
 #endif // RAKVIDEO_WRAPPER_H_

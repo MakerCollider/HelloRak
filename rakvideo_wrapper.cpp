@@ -46,6 +46,7 @@ void RakVideoWrapper::doYUVtoRGB(QByteArray yData, QByteArray uData, QByteArray 
 
 //    int time_ms = realTime.msecsTo(QTime::currentTime());
 //    qWarning() << "Thread done:" << realTime.toString("hh:mm:ss.zzz") << "useage: " << time_ms;
+
     emit signal_class->SignalImage(image);
 }
 
