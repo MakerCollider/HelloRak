@@ -1,27 +1,27 @@
 #ifndef RAKVIDEO_WRAPPER_H_
 #define RAKVIDEO_WRAPPER_H_
 
-#include <QObject>
-#include <signal.h>
 #include <QImage>
+#include <QQueue>
+#include <QObject>
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
+
 #include "image_signal.h"
 
 class RakVideoWrapper : public QObject {
     Q_OBJECT
 public:
     explicit RakVideoWrapper(QObject *parent = 0);
-    Q_INVOKABLE void callRakJava(QString message);
-
+    static void doYUVtoRGB(QByteArray yData, QByteArray uData, QByteArray vData);
     static void sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint height, jbyteArray yData,
                      jbyteArray uData, jbyteArray vData);
 
     static void registerNativeMethods();
 
-    static ImageSignal *signal_class;
+    Q_INVOKABLE void callRakJava(QString message);
 
-    static QImage image_;
+    static ImageSignal *signal_class;
 };
 
 #endif // RAKVIDEO_WRAPPER_H_

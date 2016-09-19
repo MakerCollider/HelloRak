@@ -1,40 +1,32 @@
 #include <QDebug>
-#include <QImage>
-#include <QAndroidJniObject>
-#include <QAndroidJniEnvironment>
+#include <QTime>
+#include <QtConcurrent>
 
 #include "rakvideo_wrapper.h"
 
-QImage RakVideoWrapper::image_ = QImage(640, 480, QImage::Format_ARGB32);
 ImageSignal* RakVideoWrapper::signal_class;
 
 RakVideoWrapper::RakVideoWrapper(QObject *parent) : QObject(parent) {
 
 }
 
-void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint height,
-                                  jbyteArray yData, jbyteArray uData, jbyteArray vData) {
-
-    Q_UNUSED(thiz)
-
+void RakVideoWrapper::doYUVtoRGB(QByteArray yData, QByteArray uData, QByteArray vData) {
     int r,g,b;
     float yvalue, uvalue, vvalue;
 
-    jbyte* yRawData = env->GetByteArrayElements(yData, 0);
-    jbyte* uRawData = env->GetByteArrayElements(uData, 0);
-    jbyte* vRawData = env->GetByteArrayElements(vData, 0);
+    int width = 640;
+    int height = 480;
 
-    uchar* cyData = (uchar*)(yRawData);
-    uchar* cuData = (uchar*)(uRawData);
-    uchar* cvData = (uchar*)(vRawData);
+    QImage image(640,480, QImage::Format_RGB32);
 
-    //image = QImage((int)(width), (int)(height), QImage::Format_ARGB32);
+//    QTime realTime = QTime::currentTime();
+//    qWarning() << "Thread start:" << realTime.toString("hh:mm:ss.zzz");
 
     for(int i=0; i<height; i++) {
       for(int j=0; j<width; j++) {
-        yvalue = cyData[width*i+j];
-        uvalue = cuData[i/2*(width/2)+j/2];
-        vvalue = cvData[i/2*(width/2)+j/2];
+        yvalue = yData[width*i+j];
+        uvalue = uData[i/2*(width/2)+j/2];
+        vvalue = vData[i/2*(width/2)+j/2];
 
         r = 1.164f * (yvalue - 16) + 1.596f * (vvalue - 128);
         g = 1.164f * (yvalue - 16) - 0.813f * (vvalue - 128) - 0.391f * (uvalue - 128);
@@ -48,11 +40,32 @@ void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint he
         if(g > 254) { g = 254; }
         if(b > 254) { b = 254; }
 
-        image_.setPixel(j,i,qRgb(r,g,b));
+        image.setPixel(j,i,qRgb(r,g,b));
       }
     }
 
-    emit signal_class->SignalImage(image_);
+//    int time_ms = realTime.msecsTo(QTime::currentTime());
+//    qWarning() << "Thread done:" << realTime.toString("hh:mm:ss.zzz") << "useage: " << time_ms;
+    emit signal_class->SignalImage(image);
+}
+
+void RakVideoWrapper::sendYUVtoQt(JNIEnv *env, jobject thiz, jint width, jint height,
+                                  jbyteArray yData, jbyteArray uData, jbyteArray vData) {
+    Q_UNUSED(thiz)
+
+    jbyte* yRawData = env->GetByteArrayElements(yData, 0);
+    jbyte* uRawData = env->GetByteArrayElements(uData, 0);
+    jbyte* vRawData = env->GetByteArrayElements(vData, 0);
+
+    char* cyData = (char*)(yRawData);
+    char* cuData = (char*)(uRawData);
+    char* cvData = (char*)(vRawData);
+
+    QByteArray yArray(cyData, width*height);
+    QByteArray uArray(cuData, width*height/4);
+    QByteArray vArray(cvData, width*height/4);
+
+    QFuture<void> future = QtConcurrent::run(doYUVtoRGB, yArray, uArray, vArray);
 }
 
 void RakVideoWrapper::registerNativeMethods() {

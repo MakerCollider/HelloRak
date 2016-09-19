@@ -78,8 +78,18 @@ Window {
 
             Component.onCompleted: {
                 signal_class.SignalImage.connect(function(in_image) {
-                    drawImageItem.changeImage(in_image);
+                    drawImageItem.addImageQueue(in_image);
                 })
+               timer.start();
+            }
+
+            Timer {
+                id: timer;
+                interval: 40;
+                repeat: true
+                onTriggered: {
+                    drawImageItem.changeImage();
+                }
             }
         }
 

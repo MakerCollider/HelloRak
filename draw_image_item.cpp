@@ -3,17 +3,26 @@
 
 #include "draw_image_item.h"
 
-QDrawImageItem::QDrawImageItem(QQuickItem *parent) : QQuickPaintedItem(parent)
-{
-    //image123 = new QImage(640,480,QImage::Format_RGB32);
+QDrawImageItem::QDrawImageItem(QQuickItem *parent) : QQuickPaintedItem(parent) {
+
 }
 
 void QDrawImageItem::paint(QPainter *painter) {
-
-    painter->drawImage(0,0,image123);
+  if(!image_queue_.empty()) {
+    painter->drawImage(0,0,image_queue_.dequeue());
+  } else {
+      qWarning("image_queue_ is empty");
+  }
 }
 
-void QDrawImageItem::changeImage(QImage& image) {
-  image123 = image.copy(0,0,image.width(),image.height());
-  update();
+void QDrawImageItem::changeImage() {
+    if(!image_queue_.empty()) {
+      update();
+    }
+    //qWarning() << "changeImage";
+}
+
+void QDrawImageItem::addImageQueue(QImage& image) {
+    image_queue_.enqueue(image);
+    //qWarning() << "addImageQueue";
 }
