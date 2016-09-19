@@ -3,14 +3,14 @@
 
 #include <QObject>
 
+// 用于传送QImage的Signal类
 class ImageSignal : public QObject {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    explicit ImageSignal(QObject *parent = 0);
+  explicit ImageSignal(QObject *parent = 0);
 
 signals:
-    void SignalImage(QImage& image);
-public slots:
+  void SignalImage(QImage& image);
 };
 
 #endif // IMAGE_SIGNAL_H_

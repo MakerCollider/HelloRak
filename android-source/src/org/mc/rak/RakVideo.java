@@ -47,9 +47,7 @@ public class RakVideo extends org.qtproject.qt5.android.bindings.QtActivity {
         _player = _module.getPlayer();
         _player.setTimeout(10000);
         _player.setAudioOutput(false);
-        _player.setRecordFrameRate(20);
-
-        boolean _recording = _player.isRecording();
+        _player.setDisplayView(_instance, null,null,0);
 
         _player.setOnGetYUVDataListener(new Player.OnGetYUVDataListener() {
                 @Override
@@ -59,7 +57,7 @@ public class RakVideo extends org.qtproject.qt5.android.bindings.QtActivity {
                 }
         });
 
-        _player.startGetYUVData(true);
         _player.play(Enums.Pipe.H264_PRIMARY, Enums.Transport.UDP);
+        _player.startGetYUVData(true);
     }
 }

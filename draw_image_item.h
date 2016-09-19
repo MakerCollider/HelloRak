@@ -5,17 +5,23 @@
 #include <QQueue>
 #include <QQuickPaintedItem>
 
+// 图像绘制类
 class QDrawImageItem : public QQuickPaintedItem {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    QDrawImageItem(QQuickItem *parent = 0);
+  QDrawImageItem(QQuickItem *parent = 0);
+  
+  // 绘制函数
+  void paint(QPainter *painter);
 
-    void paint(QPainter *painter);
-
-    Q_INVOKABLE void changeImage();
-    Q_INVOKABLE void addImageQueue(QImage& image);
+  // 更新界面图像
+  Q_INVOKABLE void changeImage();
+  
+  // 图像队列压入图像
+  Q_INVOKABLE void addImageQueue(QImage& image);
 private:
-    QQueue<QImage> image_queue_;
+  // 待显示图像队列
+  QQueue<QImage> image_queue_;
 };
 
 #endif // DRAW_IMAGE_ITEM_H_
